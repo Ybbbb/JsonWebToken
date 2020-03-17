@@ -31,8 +31,14 @@ namespace JsonWebToken.Service
                 new Claim(ClaimTypes.Name,request.Username)
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenManagement.Secret));
+            // 设置私钥，以及加密方式
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var jwtToken = new JwtSecurityToken(_tokenManagement.Issuer, _tokenManagement.Audience, claims, expires: DateTime.Now.AddMinutes(_tokenManagement.AccessExpiration), signingCredentials: credentials);
+            var jwtToken = new JwtSecurityToken(
+                _tokenManagement.Issuer,
+                _tokenManagement.Audience, claims,
+                // 一个时间戳，代表这个JWT的过期时间
+                expires: DateTime.Now.AddMinutes(_tokenManagement.AccessExpiration),
+                signingCredentials: credentials);
 
             token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 

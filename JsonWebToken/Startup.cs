@@ -34,7 +34,8 @@ namespace JsonWebToken
             services.Configure<TokenManagement>(Configuration.GetSection("tokenManagement"));
             var token = Configuration.GetSection("tokenManagement").Get<TokenManagement>();
             services.AddAuthentication(x =>
-            {
+            {   
+                // 修改默认的授权计划为 JWT
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(x =>
@@ -43,12 +44,15 @@ namespace JsonWebToken
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true,
+                    ValidateIssuerSigningKey = true, // 是否验证发行者签名的密钥
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(token.Secret)),
                     ValidIssuer = token.Issuer,
                     ValidAudience = token.Audience,
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuer = false, // 是否验证令牌发布者
+                    ValidateAudience = false, // 是否验证令牌接收对象
+                    ValidateLifetime = true, // 是否验证超时 默认为true
+                    // 缓冲过期时间，总的有效时间等于这个时间加上jwt的过期时间，如果不配置，默认是5分钟
+                    ClockSkew = TimeSpan.FromSeconds(5)
                 };
             });
             services.AddScoped<IAuthenticateService, TokenAuthenticationService>();

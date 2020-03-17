@@ -19,8 +19,5 @@ namespace JsonWebToken.Models
 
         [JsonProperty("accessExpiration")]
         public int AccessExpiration { get; set; }
-
-        [JsonProperty("refreshExpiration")]
-        public int RefreshExpiration { get; set; }
     }
 }
